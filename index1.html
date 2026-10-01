@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VATC Portal — Holistic Wireframe</title>
+<style>
+  /* ===== RESET & BASE ===== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    background: #e8e8e8;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  /* ===== WIREFRAME DESIGN TOKENS ===== */
+  :root {
+    --wf-bg: #f0f0f0;
+    --wf-card: #ffffff;
+    --wf-border: #ccc;
+    --wf-border-dash: #aaa;
+    --wf-placeholder: #d0d0d0;
+    --wf-text: #555;
+    --wf-text-dark: #222;
+    --wf-accent: #69be28;
+    --wf-accent-light: #e8f5d8;
+    --wf-blue: #3b82f6;
+    --wf-blue-light: #dbeafe;
+    --wf-red: #ef4444;
+    --wf-orange: #f59e0b;
+    --wf-purple: #8b5cf6;
+    --wf-radius: 8px;
+    --wf-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+
+  /* ===== TOP TOOLBAR ===== */
+  .wf-toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: #1a1a2e;
+    color: #fff;
+    padding: 0;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+  }
+  .wf-toolbar-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: stretch;
+  }
+  .wf-toolbar-brand {
+    padding: 12px 20px;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--wf-accent);
+    border-right: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+  .wf-toolbar-brand span {
+    background: var(--wf-accent);
+    color: #000;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  .wf-tabs {
+    display: flex;
+    align-items: stretch;
+    flex: 1;
+    overflow-x: auto;
+  }
+  .wf-tab {
+    padding: 14px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    border: none;
+    background: none;
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .wf-tab:hover { color: rgba(255,255,255,0.8); background: rgba(255,255,255,0.05); }
+  .wf-tab.active {
+    color: #fff;
+    border-bottom-color: var(--wf-accent);
+    background: rgba(105,190,40,0.08);
+  }
+  .wf-tab .tab-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800;
+  }
+  .wf-tab.active .tab-num {
+    background: var(--wf-accent);
+    color: #000;
+  }
+  .wf-toolbar-meta {
+    padding: 12px 20px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    border-left: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    white-space: nowrap;
+  }
+  .wf-toolbar-meta .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--wf-accent); }
+
+  /* ===== FLOW MAP ===== */
+  .wf-flow-bar {
+    background: #fff;
+    border-bottom: 1px solid var(--wf-border);
+    padding: 16px 24px;
+  }
+  .wf-flow-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .wf-flow-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #999;
+    text-transform: uppercase;
+    margin-right: 8px;
+  }
+  .wf-flow-node {
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--wf-border);
+    background: #fafafa;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .wf-flow-node:hover { border-color: var(--wf-accent); color: var(--wf-accent); }
+  .wf-flow-node.active { background: var(--wf-accent); color: #000; border-color: var(--wf-accent); font-weight: 700; }
+  .wf-flow-arrow { color: #bbb; font-size: 14px; }
+
+  /* ===== PAGE CONTAINER ===== */
+  .wf-page { display: none; padding: 32px 24px; max-width: 1400px; margin: 0 auto; }
+  .wf-page.active { display: block; }
+
+  /* ===== WIREFRAME COMPONENTS ===== */
+  .wf-section {
+    background: var(--wf-card);
+    border: 2px dashed var(--wf-border-dash);
+    border-radius: var(--wf-radius);
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+  .wf-section-label {
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    background: var(--wf-accent);
+    color: #000;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .wf-section-label.blue { background: var(--wf-blue); color: #fff; }
+  .wf-section-label.purple { background: var(--wf-purple); color: #fff; }
+  .wf-section-label.orange { background: var(--wf-orange); color: #000; }
+  .wf-section-label.red { background: var(--wf-red); color: #fff; }
+
+  .wf-box {
+    background: var(--wf-placeholder);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .wf-box.img {
+    background: repeating-linear-gradient(45deg, #e0e0e0, #e0e0e0 10px, #d5d5d5 10px, #d5d5d5 20px);
+    color: #999;
+    position: relative;
+  }
+  .wf-box.img::after {
+    content: '✕';
+    font-size: 24px;
+    color: #bbb;
+  }
+
+  .wf-text-line {
+    height: 10px;
+    background: #ddd;
+    border-radius: 5px;
+    margin-bottom: 8px;
+  }
+  .wf-text-line.short { width: 60%; }
+  .wf-text-line.medium { width: 80%; }
+  .wf-text-line.xs { width: 40%; height: 8px; }
+
+  .wf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: 2px solid;
+    cursor: default;
+  }
+  .wf-btn.primary { background: var(--wf-accent); color: #000; border-color: var(--wf-accent); }
+  .wf-btn.outline { background: transparent; color: #666; border-color: #bbb; }
+  .wf-btn.blue { background: var(--wf-blue); color: #fff; border-color: var(--wf-blue); }
+  .wf-btn.small { padding: 6px 12px; font-size: 10px; }
+  .wf-btn.red { background: var(--wf-red); color: #fff; border-color: var(--wf-red); }
+
+  .wf-input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background: #fafafa;
+    font-size: 12px;
+    color: #999;
+  }
+
+  .wf-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .wf-badge.green { background: var(--wf-accent-light); color: #3d7a0a; }
+  .wf-badge.blue { background: var(--wf-blue-light); color: #1d4ed8; }
+  .wf-badge.red { background: #fee2e2; color: #dc2626; }
+  .wf-badge.orange { background: #fef3c7; color: #b45309; }
+  .wf-badge.purple { background: #ede9fe; color: #6d28d9; }
+
+  .wf-grid { display: grid; gap: 16px; }
+  .wf-grid-2 { grid-template-columns: 1fr 1fr; }
+  .wf-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .wf-grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .wf-grid-sidebar { grid-template-columns: 240px 1fr; }
+
+  .wf-annotation {
+    font-size: 10px;
+    color: var(--wf-blue);
+    font-weight: 600;
+    font-style: italic;
+    margin-top: 6px;
+  }
+
+  .wf-divider {
+    border: none;
+    border-top: 1px dashed #ccc;
+    margin: 20px 0;
+  }
+
+  /* ===== PAGE TITLE ===== */
+  .wf-page-title {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--wf-accent);
+  }
+  .wf-page-title h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--wf-text-dark);
+    margin-bottom: 4px;
+  }
+  .wf-page-title p {
+    font-size: 13px;
+    color: #888;
+  }
+
+  /* ===== SPECIFIC COMPONENTS ===== */
+
+  /* -- Navbar wireframe -- */
+  .wf-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: #222;
+    border-radius: var(--wf-radius);
+    margin-bottom: 20px;
+  }
+  .wf-navbar .logo-placeholder {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--wf-accent);
+  }
+  .wf-navbar .nav-items { display: flex; gap: 16px; }
+  .wf-navbar .nav-item {
+    width: 60px; height: 8px;
+    background: #555;
+    border-radius: 4px;
+  }
+  .wf-navbar .nav-item.cta {
+    width: 80px; height: 28px;
+    background: var(--wf-accent);
+    border-radius: 6px;
+  }
+
+  /* -- Hero wireframe -- */
+  .wf-hero {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: center;
+    padding: 40px;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border-radius: var(--wf-radius);
+    min-height: 320px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .wf-hero .hero-text h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .wf-hero .hero-text h2 .accent { color: var(--wf-accent); }
+  .wf-hero .hero-text .wf-text-line { background: #444; }
+  .wf-hero .hero-visual {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wf-hero .logo-circle {
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    border: 2px dashed rgba(105,190,40,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wf-hero .logo-circle-inner {
+    width: 140px; height: 140px;
+    border-radius: 50%;
+    background: rgba(105,190,40,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--wf-accent);
+    font-weight: 700;
+  }
+  .wf-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .wf-hero-stat {
+    text-align: center;
+    padding: 12px;
+    border-top: 1px solid #444;
+  }
+  .wf-hero-stat .num { font-size: 20px; font-weight: 800; color: var(--wf-accent); }
+  .wf-hero-stat .label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+
+  /* -- Card wireframe -- */
+  .wf-card {
+    background: var(--wf-card);
+    border: 1px solid var(--wf-border);
+    border-radius: var(--wf-radius);
+    padding: 20px;
+    box-shadow: var(--wf-shadow);
+  }
+  .wf-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .wf-card-header h3 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--wf-text-dark);
+  }
+
+  /* -- Table wireframe -- */
+  .wf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .wf-table th {
+    text-align: left;
+    padding: 10px 12px;
+    background: #f5f5f5;
+    border-bottom: 2px solid #ddd;
+    font-weight: 700;
+    color: #666;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .wf-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid #eee;
+    color: #555;
+  }
+  .wf-table tr:hover td { background: #fafafa; }
+
+  /* -- Sidebar wireframe -- */
+  .wf-sidebar {
+    background: #1a1a2e;
+    border-radius: var(--wf-radius);
+    padding: 20px 0;
+    min-height: 600px;
+  }
+  .wf-sidebar-brand {
+    padding: 0 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 12px;
+  }
+  .wf-sidebar-brand h3 {
+    color: var(--wf-accent);
+    font-size: 14px;
+    font-weight: 800;
+  }
+  .wf-sidebar-brand p {
+    color: rgba(255,255,255,0.4);
+    font-size: 10px;
+  }
+  .wf-sidebar-item {
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: rgba(255,255,255,0.5);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .wf-sidebar-item:hover { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); }
+  .wf-sidebar-item.active {
+    background: rgba(105,190,40,0.1);
+    color: var(--wf-accent);
+    border-right: 3px solid var(--wf-accent);
+    font-weight: 700;
+  }
+  .wf-sidebar-item .icon {
+    width: 18px; height: 18px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .wf-sidebar-item.active .icon { background: rgba(105,190,40,0.2); }
+  .wf-sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 12px 20px;
+  }
+  .wf-sidebar-label {
+    padding: 8px 20px 4px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: rgba(255,255,255,0.25);
+    text-transform: uppercase;
+  }
+
+  /* -- Stat cards -- */
+  .wf-stat-card {
+    background: var(--wf-card);
+    border: 1px solid var(--wf-border);
+    border-radius: var(--wf-radius);
+    padding: 20px;
+    box-shadow: var(--wf-shadow);
+  }
+  .wf-stat-card .stat-label {
+    font-size: 11px;
+    color: #888;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .wf-stat-card .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--wf-text-dark);
+  }
+  .wf-stat-card .stat-change {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  .wf-stat-card .stat-change.up { color: var(--wf-accent); }
+  .wf-stat-card .stat-change.down { color: var(--wf-red); }
+
+  /* -- Member card wireframe -- */
+  .wf-member-card {
+    width: 380px;
+    aspect-ratio: 90/54;
+    background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #333;
+    margin: 0 auto;
+  }
+  .wf-member-card .mc-accent {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--wf-accent);
+  }
+  .wf-member-card .mc-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .wf-member-card .mc-logo-text {
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+  }
+  .wf-member-card .mc-logo-sub {
+    font-size: 7px;
+    color: var(--wf-accent);
+    letter-spacing: 2px;
+  }
+  .wf-member-card .mc-status {
+    padding: 3px 8px;
+    background: var(--wf-accent);
+    color: #000;
+    font-size: 8px;
+    font-weight: 800;
+    border-radius: 3px;
+    letter-spacing: 1px;
+  }
+  .wf-member-card .mc-name {
+    margin-top: 28px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+  }
+  .wf-member-card .mc-name-label {
+    font-size: 7px;
+    color: #888;
+    letter-spacing: 2px;
+    margin-bottom: 2px;
+  }
+  .wf-member-card .mc-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+  }
+  .wf-member-card .mc-detail-label {
+    font-size: 7px;
+    color: #888;
+    letter-spacing: 1px;
+  }
+  .wf-member-card .mc-detail-val {
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .wf-member-card .mc-qr {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    background: #fff;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #999;
+  }
+
+  /* -- Chart placeholder -- */
+  .wf-chart {
+    height: 200px;
+    background: linear-gradient(180deg, rgba(105,190,40,0.05) 0%, transparent 100%);
+    border: 1px dashed #ccc;
+    border-radius: var(--wf-radius);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+  }
+  .wf-chart-bar {
+    width: 24px;
+    background: var(--wf-accent);
+    border-radius: 4px 4px 0 0;
+    opacity: 0.6;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .wf-hero { grid-template-columns: 1fr; }
+    .wf-grid-2, .wf-grid-3, .wf-grid-4 { grid-template-columns: 1fr; }
+    .wf-grid-sidebar { grid-template-columns: 1fr; }
+    .wf-toolbar-inner { flex-wrap: wrap; }
+    .wf-toolbar-meta { display: none; }
+    .wf-member-card { width: 100%; }
+  }
+
+  /* ===== CONNECTION ARROWS ===== */
+  .wf-connection {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 0;
+    color: #aaa;
+    font-size: 11px;
+    gap: 8px;
+  }
+  .wf-connection .arrow { font-size: 16px; color: var(--wf-accent); }
+  .wf-connection .label {
+    background: var(--wf-accent-light);
+    color: #3d7a0a;
+    padding: 2px 10px;
+    border-radius: 99px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== TOOLBAR ===== -->
+<div class="wf-toolbar">
+  <div class="wf-toolbar-inner">
+    <div class="wf-toolbar-brand">
+      VATC PORTAL <span>WIREFRAME</span>
+    </div>
+    <div class="wf-tabs">
+      <button class="wf-tab active" onclick="showPage('landing')">
+        <span class="tab-num">1</span> Landing Page
+      </button>
+      <button class="wf-tab" onclick="showPage('registration')">
+        <span class="tab-num">2</span> Registration
+      </button>
+      <button class="wf-tab" onclick="showPage('member')">
+        <span class="tab-num">3</span> Member Portal
+      </button>
+      <button class="wf-tab" onclick="showPage('admin')">
+        <span class="tab-num">4</span> Admin Console
+      </button>
+    </div>
+    <div class="wf-toolbar-meta">
+      <span class="dot"></span> v1.0 — Okt 2026
+    </div>
+  </div>
+</div>
+
+<!-- ===== FLOW MAP ===== -->
+<div class="wf-flow-bar">
+  <div class="wf-flow-inner">
+    <span class="wf-flow-label">User Flow:</span>
+    <span class="wf-flow-node active" onclick="showPage('landing')">Landing</span>
+    <span class="wf-flow-arrow">→</span>
+    <span class="wf-flow-node" onclick="showPage('registration')">Register</span>
+    <span class="wf-flow-arrow">→</span>
+    <span class="wf-flow-node" onclick="showPage('member')">Member Dashboard</span>
+    <span class="wf-flow-arrow" style="margin-left:24px;">⫸</span>
+    <span class="wf-flow-node" onclick="showPage('admin')" style="border-color:var(--wf-purple);color:var(--wf-purple);">Admin Console</span>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 1: LANDING PAGE                       -->
+<!-- ========================================== -->
+<div class="wf-page active" id="page-landing">
+  <div class="wf-page-title">
+    <h1>① Landing Page</h1>
+    <p>Halaman utama awam — pengenalan kelab, model Versys, takwim acara, galeri, CLO, dan CTA pendaftaran. (Sedia ada — dipertingkat)</p>
+  </div>
+
+  <!-- Navbar -->
+  <div class="wf-section">
+    <span class="wf-section-label">NAVBAR — Fixed Top</span>
+    <div class="wf-navbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="logo-placeholder"></div>
+        <div>
+          <div style="color:#fff;font-size:12px;font-weight:800;">VATC</div>
+          <div style="color:#666;font-size:8px;letter-spacing:1px;">MALAYSIA</div>
+        </div>
+      </div>
+      <div class="nav-items">
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item"></div>
+        <div class="nav-item cta"></div>
+      </div>
+    </div>
+    <div class="wf-annotation">Kelab · Versys · Konvoi · Galeri · CLO · Kad Digital · [Sertai → ke Registration Page]</div>
+  </div>
+
+  <!-- Hero -->
+  <div class="wf-section">
+    <span class="wf-section-label">HERO SECTION</span>
+    <div class="wf-hero">
+      <div class="hero-text">
+        <div style="display:inline-block;padding:4px 12px;border-radius:99px;background:rgba(105,190,40,0.15);border:1px solid rgba(105,190,40,0.3);font-size:10px;color:var(--wf-accent);font-weight:600;margin-bottom:16px;">
+          ● KOMUNITI RASMI
+        </div>
+        <h2>VERSYS ADVENTURE<br><span class="accent">TOURING CLUB</span></h2>
+        <div class="wf-text-line" style="background:#444;width:90%;margin-top:12px;"></div>
+        <div class="wf-text-line" style="background:#444;width:75%;"></div>
+        <div class="wf-text-line" style="background:#444;width:60%;"></div>
+        <div style="display:flex;gap:10px;margin-top:20px;">
+          <div class="wf-btn primary">Sertai Keahlian 2026 →</div>
+          <div class="wf-btn outline" style="color:#aaa;border-color:#555;">Jadual Konvoi</div>
+        </div>
+        <div class="wf-hero-stats">
+          <div class="wf-hero-stat"><div class="num">0</div><div class="label">Ahli</div></div>
+          <div class="wf-hero-stat"><div class="num">0</div><div class="label">Negeri</div></div>
+          <div class="wf-hero-stat"><div class="num">2024</div><div class="label">Tahun</div></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="logo-circle">
+          <div class="logo-circle-inner">LOGO<br>VATC</div>
+        </div>
+      </div>
+    </div>
+    <div class="wf-annotation">CTA "Sertai Keahlian" → navigasi ke Registration Page (halaman 2)</div>
+  </div>
+
+  <!-- About -->
+  <div class="wf-section">
+    <span class="wf-section-label">ABOUT / IDENTITI</span>
+    <div class="wf-grid wf-grid-2">
+      <div>
+        <div class="wf-box img" style="height:280px;border-radius:12px;">Org Chart - VATC Admin</div>
+        <div class="wf-annotation">Gambar rasmi kelab atau logo besar VATC</div>
+      </div>
+      <div>
+        <div class="wf-text-line" style="width:40%;height:8px;background:var(--wf-accent);margin-bottom:12px;"></div>
+        <div style="font-size:18px;font-weight:800;color:var(--wf-text-dark);margin-bottom:12px;">Prinsip & Hala Tuju VATC</div>
+        <div class="wf-text-line medium"></div>
+        <div class="wf-text-line"></div>
+        <div class="wf-text-line short"></div>
+        <div class="wf-grid wf-grid-2" style="margin-top:20px;">
+          <div class="wf-card" style="padding:14px;">
+            <div style="font-size:18px;margin-bottom:6px;">🛡️</div>
+            <div style="font-size:12px;font-weight:700;">Keselamatan Konvoi</div>
+            <div class="wf-text-line xs" style="margin-top:6px;"></div>
+          </div>
+          <div class="wf-card" style="padding:14px;">
+            <div style="font-size:18px;margin-bottom:6px;">🔧</div>
+            <div style="font-size:12px;font-weight:700;">Sokongan Teknikal</div>
+            <div class="wf-text-line xs" style="margin-top:6px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bikes -->
+  <div class="wf-section">
+    <span class="wf-section-label">BIKES — Kawasaki Versys Series</span>
+    <div class="wf-grid wf-grid-2">
+      <div class="wf-card">
+        <div class="wf-badge green">FLAGSHIP</div>
+        <div style="font-size:16px;font-weight:800;margin:8px 0 4px;">Versys 1100/1000</div>
+        <div style="font-size:11px;color:var(--wf-accent);font-weight:600;">1043cc In-line 4</div>
+        <div class="wf-text-line" style="margin-top:10px;"></div>
+        <div class="wf-text-line short"></div>
+        <div class="wf-grid wf-grid-2" style="margin-top:12px;">
+          <div class="wf-box" style="height:48px;">120 PS</div>
+          <div class="wf-box" style="height:48px;">21L</div>
+          <div class="wf-box" style="height:48px;">TFT</div>
+          <div class="wf-box" style="height:48px;">Cruise</div>
+        </div>
+      </div>
+      <div class="wf-card">
+        <div class="wf-badge blue">MIDDLEWEIGHT</div>
+        <div style="font-size:16px;font-weight:800;margin:8px 0 4px;">Versys 650</div>
+        <div style="font-size:11px;color:var(--wf-accent);font-weight:600;">649cc Parallel Twin</div>
+        <div class="wf-text-line" style="margin-top:10px;"></div>
+        <div class="wf-text-line short"></div>
+        <div class="wf-grid wf-grid-2" style="margin-top:12px;">
+          <div class="wf-box" style="height:48px;">67 PS</div>
+          <div class="wf-box" style="height:48px;">21L</div>
+          <div class="wf-box" style="height:48px;">Windshield</div>
+          <div class="wf-box" style="height:48px;">2-Mod</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events -->
+  <div class="wf-section">
+    <span class="wf-section-label">EVENTS — Takwim 2026</span>
+    <div class="wf-grid wf-grid-3">
+      <div class="wf-card">
+        <div class="wf-badge green">DISAHKAN • 3H2M</div>
+        <div style="font-size:13px;font-weight:800;margin:8px 0;">Ride Selekoh: Grik–Betong–Yala</div>
+        <div class="wf-text-line"></div>
+        <div class="wf-text-line short"></div>
+        <div style="font-size:11px;color:#888;margin-top:10px;">📅 15–17 Mei 2026</div>
+        <div class="wf-btn primary small" style="width:100%;margin-top:12px;">Tempah Slot</div>
+      </div>
+      <div class="wf-card">
+        <div class="wf-badge orange">BULANAN</div>
+        <div style="font-size:13px;font-weight:800;margin:8px 0;">TT @ TTG & Genting Night Loop</div>
+        <div class="wf-text-line"></div>
+        <div class="wf-text-line short"></div>
+        <div style="font-size:11px;color:#888;margin-top:10px;">📅 Setiap Sabtu Minggu Ke-3</div>
+        <div class="wf-btn primary small" style="width:100%;margin-top:12px;">Tempah Slot</div>
+      </div>
+      <div class="wf-card">
+        <div class="wf-badge purple">MEGA GATHERING</div>
+        <div style="font-size:13px;font-weight:800;margin:8px 0;">Grand Annual Assembly 2026</div>
+        <div class="wf-text-line"></div>
+        <div class="wf-text-line short"></div>
+        <div style="font-size:11px;color:#888;margin-top:10px;">📅 24–25 Okt 2026</div>
+        <div class="wf-btn primary small" style="width:100%;margin-top:12px;">Tempah Slot</div>
+      </div>
+    </div>
+    <div class="wf-annotation">"Tempah Slot" → jika belum login, redirect ke Registration Page. Jika ahli, terus ke Member Portal > Event Booking.</div>
+  </div>
+
+  <!-- Gallery + CLO -->
+  <div class="wf-grid wf-grid-2">
+    <div class="wf-section">
+      <span class="wf-section-label">GALLERY LINK</span>
+      <div class="wf-card" style="text-align:center;padding:32px;">
+        <div style="font-size:32px;margin-bottom:8px;">📸</div>
+        <div style="font-size:14px;font-weight:800;">Galeri Aktiviti Kelab</div>
+        <div class="wf-text-line medium" style="margin:10px auto;"></div>
+        <div class="wf-btn outline small" style="margin-top:12px;">Buka Galeri → vatc-gallery.web.app</div>
+      </div>
+    </div>
+    <div class="wf-section">
+      <span class="wf-section-label blue">CLO — Pegawai Perhubungan</span>
+      <div class="wf-card" style="padding:24px;">
+        <div style="display:flex;gap:16px;align-items:center;">
+          <div class="wf-box" style="width:64px;height:64px;border-radius:50%;background:var(--wf-accent);color:#000;font-weight:800;font-size:18px;">zW</div>
+          <div>
+            <div style="font-size:10px;color:var(--wf-accent);font-weight:700;letter-spacing:1px;">CLO</div>
+            <div style="font-size:14px;font-weight:800;">Ts. Mohd Zaid Redhuan</div>
+            <div style="font-size:11px;color:#888;">(zWan)</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;">
+          <div class="wf-btn primary small">WhatsApp</div>
+          <div class="wf-btn outline small">📧 Emel</div>
+          <div class="wf-btn outline small">📱 Telefon</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Card Preview + CTA to Register -->
+  <div class="wf-section">
+    <span class="wf-section-label">KAD DIGITAL PREVIEW + CTA</span>
+    <div class="wf-grid wf-grid-2" style="align-items:center;">
+      <div>
+        <div class="wf-member-card">
+          <div class="mc-accent"></div>
+          <div class="mc-top">
+            <div>
+              <div class="mc-logo-text">VATC MALAYSIA</div>
+              <div class="mc-logo-sub">VERSYS ADVENTURE CLUB</div>
+            </div>
+            <div class="mc-status">AHLI AKTIF</div>
+          </div>
+          <div class="mc-name-label">NAMA AHLI</div>
+          <div class="mc-name">Ts. Mohd Zaid Redhuan</div>
+          <div class="mc-details">
+            <div><div class="mc-detail-label">NO. KEAHLIAN</div><div class="mc-detail-val">VATC-2024-001</div></div>
+            <div><div class="mc-detail-label">MOTOSIKAL</div><div class="mc-detail-val">Versys 1100 SE</div></div>
+          </div>
+          <div class="mc-qr">QR</div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:16px;font-weight:800;margin-bottom:8px;">Dapatkan Kad Digital Anda</div>
+        <div class="wf-text-line medium" style="margin:0 auto 8px;"></div>
+        <div class="wf-text-line short" style="margin:0 auto 16px;"></div>
+        <div class="wf-btn primary" style="font-size:14px;padding:14px 32px;">Sertai Keahlian 2026 →</div>
+        <div class="wf-annotation" style="margin-top:12px;">CTA ini → navigasi ke Registration Page</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="wf-section">
+    <span class="wf-section-label">FOOTER</span>
+    <div class="wf-grid wf-grid-3" style="padding:20px 0;">
+      <div>
+        <div style="font-size:14px;font-weight:800;margin-bottom:8px;">VATC Malaysia</div>
+        <div class="wf-text-line medium"></div>
+        <div class="wf-text-line short"></div>
+        <div style="color:var(--wf-accent);font-size:11px;font-weight:700;margin-top:8px;">ONE BIKE | ONE FAMILY | ONE VATC</div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:10px;color:#888;">NAVIGASI</div>
+        <div class="wf-text-line xs"></div><div class="wf-text-line xs"></div><div class="wf-text-line xs"></div><div class="wf-text-line xs"></div>
+      </div>
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:2px;margin-bottom:10px;color:#888;">HUBUNGI</div>
+        <div class="wf-text-line xs"></div><div class="wf-text-line xs"></div><div class="wf-text-line xs"></div>
+      </div>
+    </div>
+    <div style="text-align:center;font-size:10px;color:#aaa;padding-top:16px;border-top:1px dashed #ccc;">© 2024–2026 VATC Malaysia. Hak Cipta Terpelihara.</div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 2: REGISTRATION                       -->
+<!-- ========================================== -->
+<div class="wf-page" id="page-registration">
+  <div class="wf-page-title">
+    <h1>② Registration Page</h1>
+    <p>Halaman pendaftaran keahlian baharu — borang, pemilihan pakej, pembayaran FPX/ToyyibPay, dan penjanaan kad digital automatik.</p>
+  </div>
+
+  <!-- Top bar -->
+  <div class="wf-section">
+    <span class="wf-section-label">TOP BAR</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--wf-accent);"></div>
+        <span style="font-weight:800;font-size:13px;">VATC Malaysia</span>
+      </div>
+      <div style="font-size:11px;color:#888;">Sudah ahli? <span style="color:var(--wf-accent);font-weight:700;cursor:pointer;">Log masuk →</span></div>
+    </div>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="wf-section">
+    <span class="wf-section-label blue">PROGRESS STEPPER</span>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;padding:16px 0;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--wf-accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">✓</div>
+        <span style="font-size:12px;font-weight:700;">Maklumat Peribadi</span>
+      </div>
+      <div style="width:60px;height:2px;background:var(--wf-accent);margin:0 12px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--wf-accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">2</div>
+        <span style="font-size:12px;font-weight:700;">Pakej & Bayaran</span>
+      </div>
+      <div style="width:60px;height:2px;background:#ddd;margin:0 12px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:#ddd;color:#888;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;">3</div>
+        <span style="font-size:12px;color:#888;">Pengesahan & Kad</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="wf-grid wf-grid-2" style="align-items:start;">
+    <div>
+      <div class="wf-section">
+        <span class="wf-section-label">BORANG PENDAFTARAN</span>
+        <div style="display:flex;flex-direction:column;gap:14px;">
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#666;">Nama Penuh (MyKad)</label>
+            <div class="wf-input">Nama penuh anda...</div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#666;">No. Telefon (WhatsApp)</label>
+            <div class="wf-input">+60 12-345 6789</div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#666;">Alamat Emel</label>
+            <div class="wf-input">emel@contoh.com</div>
+          </div>
+          <div class="wf-grid wf-grid-2">
+            <div>
+              <label style="font-size:11px;font-weight:600;color:#666;">Model Motosikal</label>
+              <div class="wf-input">Pilih model... ▾</div>
+            </div>
+            <div>
+              <label style="font-size:11px;font-weight:600;color:#666;">No. Plat Motor</label>
+              <div class="wf-input">ABC 1234</div>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#666;">Negeri / Region</label>
+            <div class="wf-input">Pilih negeri... ▾</div>
+          </div>
+          <div>
+            <label style="font-size:11px;font-weight:600;color:#666;">Muat Naik Gambar Motosikal</label>
+            <div class="wf-box" style="height:80px;border:2px dashed #ccc;border-radius:8px;">📷 Drag & drop atau klik untuk muat naik</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="wf-section">
+        <span class="wf-section-label orange">PILIHAN PAKEJ</span>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div class="wf-card" style="border:2px solid var(--wf-accent);background:var(--wf-accent-light);position:relative;">
+            <div style="position:absolute;top:8px;right:12px;color:var(--wf-accent);font-weight:800;">✓</div>
+            <div style="font-size:13px;font-weight:700;">Pakej Asas</div>
+            <div style="font-size:22px;font-weight:800;color:var(--wf-accent);">RM 100</div>
+            <div style="font-size:11px;color:#666;margin-top:4px;">Kad Digital + Stiker Rasmi</div>
+          </div>
+          <div class="wf-card" style="border:1px solid var(--wf-border);">
+            <div style="font-size:13px;font-weight:700;">Pakej Premium</div>
+            <div style="font-size:22px;font-weight:800;color:var(--wf-text-dark);">RM 180</div>
+            <div style="font-size:11px;color:#666;margin-top:4px;">Baju T Rasmi + Patch Metal + Kad Digital + Stiker</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf-section">
+        <span class="wf-section-label red">PAYMENT GATEWAY</span>
+        <div class="wf-card" style="text-align:center;padding:24px;">
+          <div style="font-size:12px;font-weight:700;margin-bottom:12px;">Jumlah: <span style="color:var(--wf-accent);font-size:18px;">RM 100</span></div>
+          <div class="wf-btn primary" style="width:100%;padding:14px;font-size:13px;">🔒 Sahkan & Bayar (FPX / ToyyibPay)</div>
+          <div style="font-size:10px;color:#aaa;margin-top:10px;">Transaksi Selamat • SSL Encrypted</div>
+          <div style="display:flex;justify-content:center;gap:12px;margin-top:12px;">
+            <div class="wf-box" style="width:48px;height:28px;font-size:8px;">FPX</div>
+            <div class="wf-box" style="width:48px;height:28px;font-size:8px;">Toyyib</div>
+            <div class="wf-box" style="width:48px;height:28px;font-size:8px;">Visa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success State -->
+  <div class="wf-section">
+    <span class="wf-section-label">SUCCESS STATE — Selepas Pembayaran</span>
+    <div style="text-align:center;padding:32px;">
+      <div style="font-size:48px;margin-bottom:12px;">✅</div>
+      <div style="font-size:18px;font-weight:800;color:var(--wf-accent);">Pendaftaran Berjaya!</div>
+      <div class="wf-text-line medium" style="margin:10px auto;"></div>
+      <div style="font-size:12px;color:#888;margin-bottom:20px;">No. Keahlian anda: <strong>VATC-2026-XXX</strong></div>
+      <div class="wf-member-card" style="margin:20px auto;">
+        <div class="mc-accent"></div>
+        <div class="mc-top">
+          <div><div class="mc-logo-text">VATC MALAYSIA</div><div class="mc-logo-sub">VERSYS ADVENTURE CLUB</div></div>
+          <div class="mc-status">AHLI AKTIF</div>
+        </div>
+        <div class="mc-name-label">NAMA AHLI</div>
+        <div class="mc-name">[Nama Ahli Baharu]</div>
+        <div class="mc-details">
+          <div><div class="mc-detail-label">NO. KEAHLIAN</div><div class="mc-detail-val">VATC-2026-XXX</div></div>
+          <div><div class="mc-detail-label">MOTOSIKAL</div><div class="mc-detail-val">[Model]</div></div>
+        </div>
+        <div class="mc-qr">QR</div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:20px;">
+        <div class="wf-btn primary">Masuk ke Member Portal →</div>
+        <div class="wf-btn outline">Muat Turun Kad (PNG)</div>
+      </div>
+      <div class="wf-annotation">Auto-generate kad digital + QR → redirect ke Member Portal</div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 3: MEMBER PORTAL                      -->
+<!-- ========================================== -->
+<div class="wf-page" id="page-member">
+  <div class="wf-page-title">
+    <h1>③ Member Portal</h1>
+    <p>Dashboard peribadi ahli — kad digital, profil, tempahan konvoi, sejarah ride, direktori ahli, dan pengumuman.</p>
+  </div>
+
+  <!-- Member Top Bar -->
+  <div class="wf-section">
+    <span class="wf-section-label">MEMBER NAVBAR</span>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:32px;height:32px;border-radius:50%;background:var(--wf-accent);"></div>
+        <span style="font-weight:800;font-size:13px;">VATC Member Portal</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px;">
+        <span style="font-size:11px;color:#888;">🔔 <span class="wf-badge red" style="font-size:8px;">3</span></span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--wf-accent);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;">zW</div>
+          <span style="font-size:12px;font-weight:600;">zWan</span>
+        </div>
+        <div class="wf-btn outline small" style="color:var(--wf-red);border-color:var(--wf-red);">Log Keluar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Member Content Grid -->
+  <div class="wf-grid wf-grid-2" style="grid-template-columns: 1fr 340px; align-items:start;">
+    <!-- Left: Main Content -->
+    <div>
+      <!-- Welcome -->
+      <div class="wf-section">
+        <span class="wf-section-label">WELCOME BANNER</span>
+        <div style="background:linear-gradient(135deg,#1a1a1a,#2a2a2a);border-radius:12px;padding:28px;color:#fff;">
+          <div style="font-size:10px;color:var(--wf-accent);font-weight:700;letter-spacing:2px;">SELAMAT DATANG</div>
+          <div style="font-size:20px;font-weight:800;margin:6px 0;">Ts. Mohd Zaid Redhuan</div>
+          <div style="font-size:12px;color:#888;">VATC-2024-001 • Versys 1100/1000 SE • Ahli Aktif</div>
+          <div style="display:flex;gap:16px;margin-top:16px;">
+            <div style="text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--wf-accent);">12</div><div style="font-size:9px;color:#888;">KONVOI</div></div>
+            <div style="text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--wf-accent);">3,240</div><div style="font-size:9px;color:#888;">KM RIDE</div></div>
+            <div style="text-align:center;"><div style="font-size:20px;font-weight:800;color:var(--wf-accent);">2</div><div style="font-size:9px;color:#888;">TAHUN</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming Events -->
+      <div class="wf-section">
+        <span class="wf-section-label blue">TEMPAHAN KONVOI SAYA</span>
+        <div class="wf-card-header">
+          <h3>Acara Akan Datang</h3>
+          <div class="wf-btn outline small">Lihat Semua</div>
+        </div>
+        <table class="wf-table">
+          <thead>
+            <tr><th>Acara</th><th>Tarikh</th><th>Status</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Ride Selekoh: Grik–Betong</td>
+              <td>15–17 Mei 2026</td>
+              <td><span class="wf-badge green">Disahkan</span></td>
+              <td><div class="wf-btn outline small">Butiran</div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">TT @ TTG Bentong</td>
+              <td>17 Jan 2026</td>
+              <td><span class="wf-badge orange">Menunggu</span></td>
+              <td><div class="wf-btn outline small">Butiran</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Browse Events -->
+      <div class="wf-section">
+        <span class="wf-section-label">TEROKAI ACARA</span>
+        <div class="wf-grid wf-grid-2">
+          <div class="wf-card">
+            <div class="wf-badge purple">MEGA</div>
+            <div style="font-size:13px;font-weight:700;margin:6px 0;">Grand Annual Assembly 2026</div>
+            <div style="font-size:11px;color:#888;">📅 24–25 Okt 2026 • Cameron Highlands</div>
+            <div class="wf-btn primary small" style="width:100%;margin-top:10px;">Tempah Slot</div>
+          </div>
+          <div class="wf-card">
+            <div class="wf-badge green">3H2M</div>
+            <div style="font-size:13px;font-weight:700;margin:6px 0;">Ride Selekoh: Grik–Betong–Yala</div>
+            <div style="font-size:11px;color:#888;">📅 15–17 Mei 2026 • Banjaran Titiwangsa</div>
+            <div class="wf-btn outline small" style="width:100%;margin-top:10px;">Slot Penuh</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ride History -->
+      <div class="wf-section">
+        <span class="wf-section-label">SEJARAH RIDE</span>
+        <table class="wf-table">
+          <thead><tr><th>Acara</th><th>Tarikh</th><th>Jarak</th><th>Laluan</th></tr></thead>
+          <tbody>
+            <tr><td>Genting Night Loop</td><td>15 Nov 2025</td><td>180 km</td><td>KL → Genting → KL</td></tr>
+            <tr><td>Ride Pantai Timur</td><td>20 Sep 2025</td><td>520 km</td><td>KL → Kuantan → KT</td></tr>
+            <tr><td>Annual Assembly 2025</td><td>25 Okt 2025</td><td>200 km</td><td>KL → Cameron</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Announcements -->
+      <div class="wf-section">
+        <span class="wf-section-label orange">PENGUMUMAN</span>
+        <div class="wf-card" style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div>
+              <span class="wf-badge red">PENTING</span>
+              <div style="font-size:13px;font-weight:700;margin:6px 0;">Kemaskini Insurans Konvoi 2026</div>
+              <div class="wf-text-line"></div>
+            </div>
+            <div style="font-size:10px;color:#aaa;">2 jam lalu</div>
+          </div>
+        </div>
+        <div class="wf-card">
+          <div style="display:flex;justify-content:space-between;align-items:start;">
+            <div>
+              <span class="wf-badge blue">INFO</span>
+              <div style="font-size:13px;font-weight:700;margin:6px 0;">Bengkel Panel Baharu: KL & Selangor</div>
+              <div class="wf-text-line short"></div>
+            </div>
+            <div style="font-size:10px;color:#aaa;">1 hari lalu</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Sidebar -->
+    <div>
+      <!-- Digital Card -->
+      <div class="wf-section">
+        <span class="wf-section-label">KAD DIGITAL</span>
+        <div class="wf-member-card">
+          <div class="mc-accent"></div>
+          <div class="mc-top">
+            <div><div class="mc-logo-text">VATC MALAYSIA</div><div class="mc-logo-sub">VERSYS ADVENTURE CLUB</div></div>
+            <div class="mc-status">AHLI AKTIF</div>
+          </div>
+          <div class="mc-name-label">NAMA AHLI</div>
+          <div class="mc-name">Ts. Mohd Zaid Redhuan</div>
+          <div class="mc-details">
+            <div><div class="mc-detail-label">NO. KEAHLIAN</div><div class="mc-detail-val">VATC-2024-001</div></div>
+            <div><div class="mc-detail-label">MOTOSIKAL</div><div class="mc-detail-val">Versys 1100 SE</div></div>
+            <div><div class="mc-detail-label">NO. PLAT</div><div class="mc-detail-val">-VERSYS</div></div>
+            <div><div class="mc-detail-label">ESTD</div><div class="mc-detail-val">2024</div></div>
+          </div>
+          <div class="mc-qr">QR</div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <div class="wf-btn primary small" style="flex:1;">Muat Turun PNG</div>
+          <div class="wf-btn outline small" style="flex:1;">Kongsi</div>
+        </div>
+      </div>
+
+      <!-- Quick Profile -->
+      <div class="wf-section">
+        <span class="wf-section-label">PROFIL SAYA</span>
+        <div class="wf-card">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#888;">Nama</span><span style="font-weight:600;">Ts. Mohd Zaid Redhuan</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#888;">Telefon</span><span style="font-weight:600;">+60 12-363 4364</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#888;">Emel</span><span style="font-weight:600;">versys...@gmail.com</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#888;">Model</span><span style="font-weight:600;">Versys 1100 SE</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#888;">Pakej</span><span class="wf-badge green">Premium</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:#888;">Status</span><span class="wf-badge green">Aktif</span></div>
+          </div>
+          <div class="wf-btn outline small" style="width:100%;margin-top:14px;">Kemaskini Profil</div>
+        </div>
+      </div>
+
+      <!-- Member Directory Preview -->
+      <div class="wf-section">
+        <span class="wf-section-label purple">DIREKTORI AHLI</span>
+        <div class="wf-card">
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">AR</div>
+              <div><div style="font-size:12px;font-weight:600;">Ahmad Rizal</div><div style="font-size:10px;color:#888;">Versys 650 • Johor</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">SF</div>
+              <div><div style="font-size:12px;font-weight:600;">Siti Farah</div><div style="font-size:10px;color:#888;">Versys 1000 • Penang</div></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div style="width:32px;height:32px;border-radius:50%;background:#ddd;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;">HK</div>
+              <div><div style="font-size:12px;font-weight:600;">Hafiz Khan</div><div style="font-size:10px;color:#888;">Versys 650 • KL</div></div>
+            </div>
+          </div>
+          <div class="wf-btn outline small" style="width:100%;margin-top:14px;">Lihat Semua Ahli →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PAGE 4: ADMIN CONSOLE                      -->
+<!-- ========================================== -->
+<div class="wf-page" id="page-admin">
+  <div class="wf-page-title">
+    <h1>④ Admin Console</h1>
+    <p>Panel pentadbiran — pengurusan ahli, acara, pembayaran, pengumuman, galeri, dan tetapan kelab. Akses terhad kepada CLO & admin sahaja.</p>
+  </div>
+
+  <div class="wf-grid wf-grid-sidebar" style="align-items:start;">
+    <!-- Sidebar -->
+    <div class="wf-sidebar">
+      <div class="wf-sidebar-brand">
+        <h3>VATC Admin</h3>
+        <p>Console v1.0</p>
+      </div>
+      <div class="wf-sidebar-item active"><div class="icon">📊</div> Dashboard</div>
+      <div class="wf-sidebar-item"><div class="icon">👥</div> Ahli</div>
+      <div class="wf-sidebar-item"><div class="icon">📅</div> Acara / Konvoi</div>
+      <div class="wf-sidebar-item"><div class="icon">💳</div> Pembayaran</div>
+      <div class="wf-sidebar-divider"></div>
+      <div class="wf-sidebar-label">Kandungan</div>
+      <div class="wf-sidebar-item"><div class="icon">📢</div> Pengumuman</div>
+      <div class="wf-sidebar-item"><div class="icon">📸</div> Galeri</div>
+      <div class="wf-sidebar-item"><div class="icon">🏍️</div> Model Versys</div>
+      <div class="wf-sidebar-divider"></div>
+      <div class="wf-sidebar-label">Sistem</div>
+      <div class="wf-sidebar-item"><div class="icon">⚙️</div> Tetapan</div>
+      <div class="wf-sidebar-item"><div class="icon">🔑</div> Admin Akses</div>
+      <div class="wf-sidebar-item" style="color:rgba(239,68,68,0.7);"><div class="icon" style="background:rgba(239,68,68,0.15);">🚪</div> Log Keluar</div>
+    </div>
+
+    <!-- Main Content -->
+    <div>
+      <!-- Stats Row -->
+      <div class="wf-grid wf-grid-4" style="margin-bottom:20px;">
+        <div class="wf-stat-card">
+          <div class="stat-label">Jumlah Ahli</div>
+          <div class="stat-value">247</div>
+          <div class="stat-change up">↑ +12 bulan ini</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="stat-label">Ahli Aktif</div>
+          <div class="stat-value">231</div>
+          <div class="stat-change up">93.5%</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="stat-label">Acara 2026</div>
+          <div class="stat-value">8</div>
+          <div class="stat-change" style="color:#888;">3 akan datang</div>
+        </div>
+        <div class="wf-stat-card">
+          <div class="stat-label">Kutipan Yuran</div>
+          <div class="stat-value">RM 38.4K</div>
+          <div class="stat-change up">↑ +RM 4.2K bulan ini</div>
+        </div>
+      </div>
+
+      <!-- Chart + Recent -->
+      <div class="wf-grid wf-grid-2" style="margin-bottom:20px;">
+        <div class="wf-section" style="margin-bottom:0;">
+          <span class="wf-section-label">PENDAFTARAN BULANAN</span>
+          <div class="wf-chart">
+            <div class="wf-chart-bar" style="height:40px;"></div>
+            <div class="wf-chart-bar" style="height:65px;"></div>
+            <div class="wf-chart-bar" style="height:50px;"></div>
+            <div class="wf-chart-bar" style="height:80px;"></div>
+            <div class="wf-chart-bar" style="height:95px;"></div>
+            <div class="wf-chart-bar" style="height:70px;"></div>
+            <div class="wf-chart-bar" style="height:110px;"></div>
+            <div class="wf-chart-bar" style="height:90px;"></div>
+            <div class="wf-chart-bar" style="height:120px;"></div>
+            <div class="wf-chart-bar" style="height:85px;"></div>
+            <div class="wf-chart-bar" style="height:100px;"></div>
+            <div class="wf-chart-bar" style="height:60px;opacity:0.3;"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:9px;color:#aaa;margin-top:6px;padding:0 4px;">
+            <span>Jan</span><span>Feb</span><span>Mac</span><span>Apr</span><span>Mei</span><span>Jun</span><span>Jul</span><span>Ogo</span><span>Sep</span><span>Okt</span><span>Nov</span><span>Dis</span>
+          </div>
+        </div>
+        <div class="wf-section" style="margin-bottom:0;">
+          <span class="wf-section-label blue">PENDAFTARAN TERKINI</span>
+          <table class="wf-table">
+            <thead><tr><th>Nama</th><th>Model</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td style="font-weight:600;">Amirul Hakim</td><td>Versys 650</td><td><span class="wf-badge orange">Pending</span></td></tr>
+              <tr><td style="font-weight:600;">Nurul Izzah</td><td>Versys 1000</td><td><span class="wf-badge green">Aktif</span></td></tr>
+              <tr><td style="font-weight:600;">Raj Kumar</td><td>Versys 650</td><td><span class="wf-badge green">Aktif</span></td></tr>
+              <tr><td style="font-weight:600;">Lee Wei Ming</td><td>Versys 1100 SE</td><td><span class="wf-badge red">Bayaran Gagal</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Members Management -->
+      <div class="wf-section">
+        <span class="wf-section-label purple">PENGURUSAN AHLI</span>
+        <div class="wf-card-header">
+          <h3>Senarai Ahli (247)</h3>
+          <div style="display:flex;gap:8px;">
+            <div class="wf-input" style="width:200px;padding:8px 12px;font-size:11px;">🔍 Cari ahli...</div>
+            <div class="wf-btn primary small">+ Tambah Ahli</div>
+            <div class="wf-btn outline small">Eksport CSV</div>
+          </div>
+        </div>
+        <table class="wf-table">
+          <thead>
+            <tr><th>No. Ahli</th><th>Nama</th><th>Model</th><th>Plat</th><th>Pakej</th><th>Status</th><th>Tindakan</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">VATC-2024-001</td>
+              <td>Ts. Mohd Zaid Redhuan</td>
+              <td>Versys 1100 SE</td>
+              <td>-VERSYS</td>
+              <td><span class="wf-badge green">Premium</span></td>
+              <td><span class="wf-badge green">Aktif</span></td>
+              <td><div class="wf-btn outline small">Edit</div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">VATC-2025-042</td>
+              <td>Ahmad Rizal</td>
+              <td>Versys 650</td>
+              <td>WXR 4421</td>
+              <td><span class="wf-badge blue">Asas</span></td>
+              <td><span class="wf-badge green">Aktif</span></td>
+              <td><div class="wf-btn outline small">Edit</div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">VATC-2026-003</td>
+              <td>Amirul Hakim</td>
+              <td>Versys 650</td>
+              <td>BJK 8832</td>
+              <td><span class="wf-badge blue">Asas</span></td>
+              <td><span class="wf-badge orange">Pending</span></td>
+              <td>
+                <div style="display:flex;gap:4px;">
+                  <div class="wf-btn primary small">✓</div>
+                  <div class="wf-btn red small">✕</div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Events Management -->
+      <div class="wf-section">
+        <span class="wf-section-label orange">PENGURUSAN ACARA</span>
+        <div class="wf-card-header">
+          <h3>Senarai Acara</h3>
+          <div class="wf-btn primary small">+ Cipta Acara Baharu</div>
+        </div>
+        <table class="wf-table">
+          <thead><tr><th>Acara</th><th>Tarikh</th><th>Slot</th><th>Ditempah</th><th>Status</th><th>Tindakan</th></tr></thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;">Ride Selekoh: Grik–Betong–Yala</td>
+              <td>15–17 Mei 2026</td>
+              <td>30</td>
+              <td>28</td>
+              <td><span class="wf-badge green">Aktif</span></td>
+              <td><div class="wf-btn outline small">Urus</div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">Grand Annual Assembly 2026</td>
+              <td>24–25 Okt 2026</td>
+              <td>200</td>
+              <td>87</td>
+              <td><span class="wf-badge green">Aktif</span></td>
+              <td><div class="wf-btn outline small">Urus</div></td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;">TT @ TTG Bentong</td>
+              <td>Setiap Sabtu Ke-3</td>
+              <td>∞</td>
+              <td>—</td>
+              <td><span class="wf-badge blue">Berulang</span></td>
+              <td><div class="wf-btn outline small">Urus</div></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Payments -->
+      <div class="wf-section">
+        <span class="wf-section-label red">PENGURUSAN PEMBAYARAN</span>
+        <div class="wf-card-header">
+          <h3>Transaksi Terkini</h3>
+          <div class="wf-btn outline small">Eksport Laporan</div>
+        </div>
+        <table class="wf-table">
+          <thead><tr><th>ID</th><th>Nama</th><th>Pakej</th><th>Jumlah</th><th>Kaedah</th><th>Status</th><th>Tarikh</th></tr></thead>
+          <tbody>
+            <tr><td>#TXN-0451</td><td>Nurul Izzah</td><td>Premium</td><td>RM 180</td><td>FPX</td><td><span class="wf-badge green">Berjaya</span></td><td>28 Sep 2026</td></tr>
+            <tr><td>#TXN-0450</td><td>Raj Kumar</td><td>Asas</td><td>RM 100</td><td>ToyyibPay</td><td><span class="wf-badge green">Berjaya</span></td><td>27 Sep 2026</td></tr>
+            <tr><td>#TXN-0449</td><td>Lee Wei Ming</td><td>Premium</td><td>RM 180</td><td>FPX</td><td><span class="wf-badge red">Gagal</span></td><td>26 Sep 2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.wf-page').forEach(p => p.classList.remove('active'));
+  // Show target
+  document.getElementById('page-' + pageId).classList.add('active');
+  // Update tabs
+  document.querySelectorAll('.wf-tab').forEach(t => t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.wf-tab');
+  const map = { landing: 0, registration: 1, member: 2, admin: 3 };
+  tabs[map[pageId]].classList.add('active');
+  // Update flow nodes
+  document.querySelectorAll('.wf-flow-node').forEach(n => n.classList.remove('active'));
+  const nodes = document.querySelectorAll('.wf-flow-node');
+  nodes[map[pageId]].classList.add('active');
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
